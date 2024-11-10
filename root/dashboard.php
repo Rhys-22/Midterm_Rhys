@@ -73,4 +73,5 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : "Unknown User";
         </div>
     </div>
 </body>
+
 </html>
