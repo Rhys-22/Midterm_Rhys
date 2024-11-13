@@ -6,6 +6,13 @@ $emailError = "";
 $passwordError = "";
 $loginError = "";
 
+// Define an array of valid email and password pairs
+$validCredentials = [
+    "rhys@email.com" => "123456",
+    "jane.doe@email.com" => "password123", // Add more emails and passwords as needed
+    "admin@email.com" => "adminpass"
+];
+
 // Check if form was submitted
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"]);
@@ -23,12 +30,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $passwordError = "Password is required";
     }
 
-    // If there are no validation errors, check credentials (simple demo validation here)
+    // If there are no validation errors, check credentials
     if (empty($emailError) && empty($passwordError)) {
-        // Demo: hardcoded email and password (replace this with a database query in a real app)
-        if ($email === "rhys@email.com" && $password === "123456") {
+        // Check if the email exists in the validCredentials array
+        if (array_key_exists($email, $validCredentials) && $validCredentials[$email] === $password) {
             $_SESSION["loggedin"] = true;
-            header("Location: welcome.php"); // Redirect to a welcome page
+            $_SESSION["email"] = $email; // Store the email in the session
+            header("Location: dashboard.php"); // Redirect to the dashboard
             exit();
         } else {
             $loginError = "Incorrect email or password";
@@ -50,40 +58,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         body {
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align items to the top of the screen */
+            align-items: flex-start;
             min-height: 100vh;
             background-color: #f5f5f5;
             margin: 0;
-            padding-top: 50px; /* Adjust padding to place the form near the top */
+            padding-top: 50px;
         }
         .login-container {
             width: 100%;
-            max-width: 400px; /* Set maximum width for the login box */
+            max-width: 400px;
         }
         .card {
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .card-header {
-            background-color: #f8f9fa; /* Light gray background */
+            background-color: #f8f9fa;
         }
-
         .card-header h3 {
             font-weight: normal;
-            color: #343a40; /* Dark color for contrast with light gray background */
+            color: #343a40;
         }
-        .alert {
-            margin-bottom: 30px;
-        }
-        .alert ul li.password-error {
-            padding-bottom: 20px;
-        }
-
     </style>
 </head>
 <body>
     <div class="login-container">
-        <!-- Error Message -->
         <?php if (!empty($emailError) || !empty($passwordError) || !empty($loginError)): ?>
             <div class="alert alert-danger">
                 <strong>System Errors</strong>
@@ -95,28 +94,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         <?php endif; ?>
 
-        <!-- Login Form -->
         <div class="card shadow-lg">
             <div class="card-header text-start">
                 <h3>Login</h3>
             </div>
             <div class="card-body">
                 <form method="POST" id="login-form">
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email address</label>
-                    <input type="text" class="form-control" id="email" name="email" placeholder="Enter email" value="<?php echo htmlspecialchars($email ?? ''); ?>">
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-            </form>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="text" class="form-control" id="email" name="email" placeholder="Enter email" value="<?php echo htmlspecialchars($email ?? ''); ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
