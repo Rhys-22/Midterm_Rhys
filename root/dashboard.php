@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    header("Location: login.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -66,7 +66,7 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : "Unknown User";
                         <!-- Logout Button positioned at top-right, higher -->
                         <a href="logout.php" class="btn btn-danger logout-btn">Logout</a>
                         <p>This section allows you to register a new student in the system.</p>
-                        <a href="register_student.php" class="btn btn-primary btn-long">Register</a>
+                        <a href="/student/register.php" class="btn btn-primary btn-long">Register</a>
                     </div>
                 </div>
             </div>
