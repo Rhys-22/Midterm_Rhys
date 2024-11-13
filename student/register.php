@@ -1,3 +1,34 @@
+<?php
+session_start();
+
+// Initialize session array if not set
+if (!isset($_SESSION['students'])) {
+    $_SESSION['students'] = [];
+}
+
+// Handle new student submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'register') {
+    $studentID = $_POST['studentID'];
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+
+    // Check for duplicate student ID
+    if (isset($_SESSION['students'][$studentID])) {
+        $error = "Student ID already exists. Please use a unique ID.";
+    } else {
+        // Add student to session
+        $_SESSION['students'][$studentID] = [
+            'studentID' => $studentID,
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'subjects' => []
+        ];
+        header("Location: register.php");
+        exit();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,37 +41,37 @@
     <div class="container my-5">
         <h2>Register a New Student</h2>
         <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/root/dashboard.php">Dashboard</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Register Student</li>
-</ol>
-
+            <ol class="breadcrumb bg-light p-3 rounded">
+                <li class="breadcrumb-item"><a href="/root/dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Register Student</li>
+            </ol>
         </nav>
-        
-        <div id="errorMessages" class="alert alert-danger d-none">
-            <ul id="errorList"></ul>
-        </div>
 
-        <!-- Form to Register or Edit a Student -->
-        <form id="studentForm" class="mb-4">
+        <?php if (isset($error)) : ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+
+        <!-- Form to Register a Student -->
+        <form method="POST" class="mb-4">
+            <input type="hidden" name="action" value="register">
             <div class="mb-3">
                 <label for="studentID" class="form-label">Student ID</label>
-                <input type="text" class="form-control" id="studentID" placeholder="Enter Student ID">
+                <input type="text" class="form-control" id="studentID" name="studentID" placeholder="Enter Student ID" required>
             </div>
             <div class="mb-3">
                 <label for="firstName" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstName" placeholder="Enter First Name">
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" required>
             </div>
             <div class="mb-3">
                 <label for="lastName" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="lastName" placeholder="Enter Last Name">
+                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter Last Name" required>
             </div>
-            <button type="button" class="btn btn-primary" id="addUpdateButton" onclick="addOrUpdateStudent()">Add Student</button>
+            <button type="submit" class="btn btn-primary">Add Student</button>
         </form>
 
         <!-- Student List Table -->
         <h3>Student List</h3>
-        <table class="table table-bordered" id="studentTable">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Student ID</th>
@@ -49,123 +80,20 @@
                     <th>Option</th>
                 </tr>
             </thead>
-            <tbody id="studentTableBody">
-                <!-- Rows will be added dynamically here -->
+            <tbody>
+                <?php foreach ($_SESSION['students'] as $id => $student) : ?>
+                    <tr>
+                        <td><?= htmlspecialchars($student['studentID']); ?></td>
+                        <td><?= htmlspecialchars($student['firstName']); ?></td>
+                        <td><?= htmlspecialchars($student['lastName']); ?></td>
+                        <td>
+                            <a href="edit.php?studentID=<?= urlencode($id); ?>" class="btn btn-info btn-sm">Edit</a>
+                            <a href="delete.php?studentID=<?= urlencode($id); ?>" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-
-    <script>
-        let students = [];
-        let editIndex = null;
-
-        function addOrUpdateStudent() {
-            const studentID = document.getElementById('studentID').value.trim();
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            
-            const errorMessages = validateForm(studentID, firstName, lastName);
-            if (errorMessages.length > 0) {
-                displayErrors(errorMessages);
-                return;
-            } else {
-                clearErrors();
-            }
-            
-            if (editIndex === null) {
-                // Check for duplicate ID before adding new student
-                if (checkDuplicateID(studentID)) {
-                    displayErrors(["Student ID already exists. Please use a unique ID."]);
-                    return;
-                }
-                students.push({ studentID, firstName, lastName, subjects: [] });
-            } else {
-                // Check for duplicate ID before updating an existing student
-                if (students[editIndex].studentID !== studentID && checkDuplicateID(studentID)) {
-                    displayErrors(["Student ID already exists. Please use a unique ID."]);
-                    return;
-                }
-                students[editIndex] = { studentID, firstName, lastName, subjects: students[editIndex].subjects };
-                editIndex = null;
-                document.getElementById('addUpdateButton').innerText = 'Add Student';
-            }
-
-            resetForm();
-            renderStudentTable();
-        }
-
-        function checkDuplicateID(studentID) {
-            return students.some((student, index) => student.studentID === studentID && index !== editIndex);
-        }
-
-        function validateForm(studentID, firstName, lastName) {
-            const errors = [];
-            if (!studentID) errors.push("Student ID is required");
-            if (!firstName) errors.push("First Name is required");
-            if (!lastName) errors.push("Last Name is required");
-            return errors;
-        }
-
-        function displayErrors(errors) {
-            const errorMessages = document.getElementById('errorMessages');
-            const errorList = document.getElementById('errorList');
-            errorList.innerHTML = '';
-            errors.forEach(error => {
-                const li = document.createElement('li');
-                li.innerText = error;
-                errorList.appendChild(li);
-            });
-            errorMessages.classList.remove('d-none');
-        }
-
-        function clearErrors() {
-            document.getElementById('errorMessages').classList.add('d-none');
-            document.getElementById('errorList').innerHTML = '';
-        }
-
-        function resetForm() {
-            document.getElementById('studentID').value = '';
-            document.getElementById('firstName').value = '';
-            document.getElementById('lastName').value = '';
-        }
-
-        function renderStudentTable() {
-            const tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
-
-            students.forEach((student, index) => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${student.studentID}</td>
-                    <td>${student.firstName}</td>
-                    <td>${student.lastName}</td>
-                    <td>
-                        <button class="btn btn-info btn-sm" onclick="editStudent(${index})">Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteStudent(${index})">Delete</button>
-                    </td>
-                `;
-
-                tbody.appendChild(row);
-            });
-        }
-
-        function editStudent(index) {
-            const student = students[index];
-            document.getElementById('studentID').value = student.studentID;
-            document.getElementById('firstName').value = student.firstName;
-            document.getElementById('lastName').value = student.lastName;
-
-            editIndex = index;
-            document.getElementById('addUpdateButton').innerText = 'Update Student';
-        }
-
-        function deleteStudent(index) {
-            students.splice(index, 1);
-            renderStudentTable();
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
