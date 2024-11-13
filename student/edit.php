@@ -35,7 +35,6 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
 </head>
 <body>
     <div class="container mt-5">
-        <!-- Title with margin-bottom class for spacing -->
         <h3 class="mb-5">Edit Student</h3>
         
         <!-- Breadcrumbs -->
@@ -61,7 +60,11 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
                 <label for="lastName" class="form-label">Last Name</label>
                 <input type="text" class="form-control" id="lastName" name="lastName" value="<?= htmlspecialchars($student['lastName']); ?>" required>
             </div>
-            <button type="submit" class="btn btn-primary">Update Student</button>
+            
+            <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-primary">Update Student</button>
+</div>
+
         </form>
     </div>
 </body>
