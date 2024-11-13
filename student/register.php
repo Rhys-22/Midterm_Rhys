@@ -27,6 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         exit();
     }
 }
+
+// Handle student deletion
+if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']])) {
+    $studentID = $_GET['studentID'];
+    unset($_SESSION['students'][$studentID]);
+    header("Location: register.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
