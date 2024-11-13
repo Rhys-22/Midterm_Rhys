@@ -6,17 +6,27 @@ if (!isset($_SESSION['students'])) {
     $_SESSION['students'] = [];
 }
 
+// Initialize error array
+$errors = [];
+
 // Handle new student submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'register') {
-    $studentID = $_POST['studentID'];
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
+    $studentID = trim($_POST['studentID']);
+    $firstName = trim($_POST['firstName']);
+    $lastName = trim($_POST['lastName']);
 
-    // Check for duplicate student ID
-    if (isset($_SESSION['students'][$studentID])) {
-        $error = "Student ID already exists. Please use a unique ID.";
-    } else {
-        // Add student to session
+    // Validate inputs
+    if (empty($studentID)) $errors[] = "Student ID is required";
+    if (empty($firstName)) $errors[] = "First Name is required";
+    if (empty($lastName)) $errors[] = "Last Name is required";
+
+    // Check for duplicate student ID if no errors
+    if (empty($errors) && isset($_SESSION['students'][$studentID])) {
+        $errors[] = "Student ID already exists. Please use a unique ID.";
+    }
+
+    // Add student if no errors
+    if (empty($errors)) {
         $_SESSION['students'][$studentID] = [
             'studentID' => $studentID,
             'firstName' => $firstName,
@@ -26,14 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         header("Location: register.php");
         exit();
     }
-}
-
-// Handle student deletion
-if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']])) {
-    $studentID = $_GET['studentID'];
-    unset($_SESSION['students'][$studentID]);
-    header("Location: register.php");
-    exit();
 }
 ?>
 
@@ -46,8 +48,8 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container my-5">
-        <h2>Register a New Student</h2>
+<div class="container mt-5">
+<h3 class="mb-5">Register a New Student</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-light p-3 rounded">
                 <li class="breadcrumb-item"><a href="/root/dashboard.php">Dashboard</a></li>
@@ -55,8 +57,15 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
             </ol>
         </nav>
 
-        <?php if (isset($error)) : ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($error); ?></div>
+        <?php if (!empty($errors)) : ?>
+            <div class="alert alert-danger">
+                <strong>System Errors</strong>
+                <ul>
+                    <?php foreach ($errors as $error) : ?>
+                        <li><?= htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         <?php endif; ?>
 
         <!-- Form to Register a Student -->
@@ -64,15 +73,15 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
             <input type="hidden" name="action" value="register">
             <div class="mb-3">
                 <label for="studentID" class="form-label">Student ID</label>
-                <input type="text" class="form-control" id="studentID" name="studentID" placeholder="Enter Student ID" required>
+                <input type="text" class="form-control" id="studentID" name="studentID" placeholder="Enter Student ID">
             </div>
             <div class="mb-3">
                 <label for="firstName" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" required>
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name">
             </div>
             <div class="mb-3">
                 <label for="lastName" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter Last Name" required>
+                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter Last Name">
             </div>
             <button type="submit" class="btn btn-primary">Add Student</button>
         </form>
@@ -97,6 +106,7 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
                         <td>
                             <a href="edit.php?studentID=<?= urlencode($id); ?>" class="btn btn-info btn-sm">Edit</a>
                             <a href="delete.php?studentID=<?= urlencode($id); ?>" class="btn btn-danger btn-sm">Delete</a>
+                            <a href="attach-subject.php?studentID=<?= urlencode($id); ?>" class="btn btn-warning btn-sm">Attach Subject</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

@@ -27,12 +27,13 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>Delete a Student</h1>
+<div class="container mt-5">
+<h3 class="mb-5">Delete a Student</h3>
+        <nav aria-label="breadcrumb">
         
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb bg-light p-3 rounded">
                 <li class="breadcrumb-item"><a href="/root/dashboard.php">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="/student/register.php">Register Student</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Delete Student</li>
