@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <h3 class="mb-5">Register a New Student</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-light p-3 rounded">
-                <li class="breadcrumb-item"><a href="/root/dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/Midterm_Rhys/dashboard.php">Dashboard</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Register Student</li>
             </ol>
         </nav>

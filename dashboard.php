@@ -66,7 +66,7 @@ $email = isset($_SESSION['email']) ? $_SESSION['email'] : "Unknown User";
                         <!-- Logout Button positioned at top-right, higher -->
                         <a href="logout.php" class="btn btn-danger logout-btn">Logout</a>
                         <p>This section allows you to register a new student in the system.</p>
-                        <a href="/student/register.php" class="btn btn-primary btn-long">Register</a>
+                        <a href="student/register.php" class="btn btn-primary btn-long">Register</a>
                     </div>
                 </div>
             </div>
