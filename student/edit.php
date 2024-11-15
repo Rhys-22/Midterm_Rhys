@@ -40,7 +40,7 @@ if (isset($_GET['studentID']) && isset($_SESSION['students'][$_GET['studentID']]
         <!-- Breadcrumbs -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-light p-3 rounded">
-                <li class="breadcrumb-item"><a href="/root/dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/Midterm_Rhys/dashboard.php">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Edit Student</li>
             </ol>
